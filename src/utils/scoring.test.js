@@ -5,6 +5,7 @@ const {
   getCountedResults,
   calculateMaxScore,
   formatTimeInMs,
+  updateBestRecord,
 } = require('./scoring');
 
 test('score thresholds match the new millisecond barème', () => {
@@ -30,4 +31,19 @@ test('the final timeout is excluded from accuracy and maximum score', () => {
 test('elapsed time is formatted in milliseconds for the round summary', () => {
   assert.equal(formatTimeInMs(1.25), '1250 ms');
   assert.equal(formatTimeInMs(0.5), '500 ms');
+});
+
+test('best record is tracked independently for each level', () => {
+  const currentRecords = { troisieme: 12, seconde: 8 };
+
+  assert.deepEqual(updateBestRecord(currentRecords, 'troisieme', 15), {
+    troisieme: 15,
+    seconde: 8,
+  });
+  assert.deepEqual(updateBestRecord(currentRecords, 'troisieme', 10), currentRecords);
+  assert.deepEqual(updateBestRecord(currentRecords, 'premiere', 7), {
+    troisieme: 12,
+    seconde: 8,
+    premiere: 7,
+  });
 });

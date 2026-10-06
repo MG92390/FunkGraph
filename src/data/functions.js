@@ -13,7 +13,7 @@ const buildFunction = (config) => ({
 const LEVELS = [
   {
     id: 'troisieme',
-    name: 'Troisième',
+    name: '3ème',
     description: 'Fonctions de base : droite et parabole',
     functions: [
       buildFunction({ id: 'identity', name: 'x', label: 'f(x) = x', fn: (x) => x, domain: [-5, 5], range: [-5, 5], color: '#2196F3', image: null, levelId: 'troisieme' }),

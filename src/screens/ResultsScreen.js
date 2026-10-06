@@ -70,7 +70,10 @@ const ResultsScreen = ({ results, onRestart, onBackToLevels }) => {
                 <View style={styles.graphsRow}>
                   {/* Correct answer graph */}
                   <View style={styles.graphBox}>
-                    <Text style={styles.graphLabel}>Correct</Text>
+                    <View style={styles.correctGraphHeader}>
+                      <Text style={styles.functionTitle}>{correctFunc?.label}</Text>
+                      <Text style={styles.graphLabel}>Correct</Text>
+                    </View>
                     {correctFunc && (
                       <GraphView func={correctFunc} width={100} height={100} />
                     )}
@@ -163,7 +166,17 @@ const styles = StyleSheet.create({
   graphLabel: {
     fontSize: 12,
     color: '#616161',
+  },
+  correctGraphHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     marginBottom: 4,
+  },
+  functionTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#1976D2',
   },
   graphPlaceholder: {
     backgroundColor: '#E0E0E0',

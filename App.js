@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeScreen from './src/screens/HomeScreen';
 import QuizScreen from './src/screens/QuizScreen';
 import ResultsScreen from './src/screens/ResultsScreen';
+import { updateBestRecord } from './src/utils/scoring';
+
+const RECORDS_STORAGE_KEY = 'funkgraphs.bestRecords.v1';
 
 /**
  * App — Root component.
@@ -15,6 +19,33 @@ export default function App() {
   const [screen, setScreen] = useState('home');
   const [selectedLevel, setSelectedLevel] = useState('troisieme');
   const [quizResults, setQuizResults] = useState([]);
+  const [recordsByLevel, setRecordsByLevel] = useState({});
+  const [recordsLoaded, setRecordsLoaded] = useState(false);
+
+  useEffect(() => {
+    let isActive = true;
+
+    AsyncStorage.getItem(RECORDS_STORAGE_KEY)
+      .then((storedRecords) => {
+        if (isActive && storedRecords) {
+          setRecordsByLevel(JSON.parse(storedRecords));
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (isActive) setRecordsLoaded(true);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (recordsLoaded) {
+      AsyncStorage.setItem(RECORDS_STORAGE_KEY, JSON.stringify(recordsByLevel)).catch(() => {});
+    }
+  }, [recordsByLevel, recordsLoaded]);
 
   const handleSelectLevel = (levelId) => {
     setSelectedLevel(levelId);
@@ -27,12 +58,16 @@ export default function App() {
 
   const handleQuizComplete = (results) => {
     setQuizResults(results);
+    const roundScore = results.reduce((total, result) => total + result.points, 0);
+    setRecordsByLevel((currentRecords) =>
+      updateBestRecord(currentRecords, selectedLevel, roundScore)
+    );
     setScreen('results');
   };
 
   const handleRestart = () => {
     setQuizResults([]);
-    setScreen('home');
+    setScreen('quiz');
   };
 
   const handleBackToLevelSelection = () => {
@@ -47,6 +82,7 @@ export default function App() {
           selectedLevel={selectedLevel}
           onSelectLevel={handleSelectLevel}
           onStart={handleStartQuiz}
+          recordsByLevel={recordsByLevel}
         />
       );
     case 'quiz':
@@ -61,6 +97,13 @@ export default function App() {
         />
       );
     default:
-      return <HomeScreen selectedLevel={selectedLevel} onSelectLevel={handleSelectLevel} onStart={handleStartQuiz} />;
+      return (
+        <HomeScreen
+          selectedLevel={selectedLevel}
+          onSelectLevel={handleSelectLevel}
+          onStart={handleStartQuiz}
+          recordsByLevel={recordsByLevel}
+        />
+      );
   }
 }

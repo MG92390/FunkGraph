@@ -19,6 +19,7 @@ const QuizScreen = ({ onQuizComplete, levelId = 'troisieme' }) => {
   const [questionNumber, setQuestionNumber] = useState(1);
   const [timeRemaining, setTimeRemaining] = useState(ROUND_TIME_SECONDS);
   const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [countdown, setCountdown] = useState(3);
   const [score, setScore] = useState(0);
 
   const level = getLevelById(levelId);
@@ -60,7 +61,21 @@ const QuizScreen = ({ onQuizComplete, levelId = 'troisieme' }) => {
   }, [currentQuestion]);
 
   useEffect(() => {
-    startNewQuestion();
+    let secondsLeft = 3;
+    setCountdown(secondsLeft);
+
+    const countdownInterval = setInterval(() => {
+      secondsLeft -= 1;
+
+      if (secondsLeft === 0) {
+        clearInterval(countdownInterval);
+        startNewQuestion();
+      } else {
+        setCountdown(secondsLeft);
+      }
+    }, 1000);
+
+    return () => clearInterval(countdownInterval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [levelId]);
 
@@ -111,7 +126,15 @@ const QuizScreen = ({ onQuizComplete, levelId = 'troisieme' }) => {
   };
 
   if (!currentQuestion) {
-    return null;
+    return (
+      <View style={styles.container}>
+        <StatusBar style="dark" />
+        <View style={styles.introContainer}>
+          <Text style={styles.introText}>Prépare-toi</Text>
+          <Text style={styles.countdownText}>{countdown}</Text>
+        </View>
+      </View>
+    );
   }
 
   return (
@@ -182,6 +205,21 @@ const styles = StyleSheet.create({
   questionContainer: {
     alignItems: 'center',
     marginBottom: 20,
+  },
+  introContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  introText: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#616161',
+  },
+  countdownText: {
+    fontSize: 64,
+    fontWeight: '800',
+    color: '#1976D2',
   },
   questionText: {
     fontSize: 18,

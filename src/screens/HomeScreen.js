@@ -10,7 +10,7 @@ import { LEVELS } from '../data/functions';
  * @param {string} selectedLevel - Current level id
  * @param {function} onSelectLevel - Called when a level card is pressed
  */
-const HomeScreen = ({ onStart, selectedLevel, onSelectLevel }) => {
+const HomeScreen = ({ onStart, selectedLevel, onSelectLevel, recordsByLevel = {} }) => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -25,6 +25,7 @@ const HomeScreen = ({ onStart, selectedLevel, onSelectLevel }) => {
       >
         {LEVELS.map((level) => {
           const isSelected = selectedLevel === level.id;
+          const record = recordsByLevel[level.id];
 
           return (
             <TouchableOpacity
@@ -42,7 +43,21 @@ const HomeScreen = ({ onStart, selectedLevel, onSelectLevel }) => {
             >
               <Text style={[styles.levelName, isSelected && styles.levelNameSelected]}>{level.name}</Text>
               <Text style={styles.levelDescription}>{level.description}</Text>
-              <Text style={styles.levelMeta}>{level.functions.length} fonctions</Text>
+              <View style={styles.metricsRow}>
+                <Text style={[styles.levelMeta, styles.functionsCount]}>{level.functions.length} fonctions</Text>
+                <View style={styles.metric}>
+                  <Text style={styles.metricLabel}>Attendu</Text>
+                  <Text style={styles.metricValue}>À définir</Text>
+                </View>
+                <View style={styles.metric}>
+                  <Text style={styles.metricLabel}>Record</Text>
+                  <Text style={styles.metricValue}>{record === undefined ? '—' : `${record} pts`}</Text>
+                </View>
+                <View style={styles.metric}>
+                  <Text style={styles.metricLabel}>Classement</Text>
+                  <Text style={styles.metricValue}>À venir</Text>
+                </View>
+              </View>
             </TouchableOpacity>
           );
         })}
@@ -105,11 +120,34 @@ const styles = StyleSheet.create({
     color: '#616161',
     marginTop: 6,
   },
+  metricsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    gap: 6,
+  },
   levelMeta: {
-    marginTop: 8,
     fontSize: 12,
     color: '#9E9E9E',
     fontWeight: '600',
+  },
+  functionsCount: {
+    flex: 1,
+  },
+  metric: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  metricLabel: {
+    fontSize: 10,
+    color: '#757575',
+    fontWeight: '600',
+  },
+  metricValue: {
+    fontSize: 11,
+    color: '#212121',
+    fontWeight: '700',
+    marginTop: 2,
   },
 });
 

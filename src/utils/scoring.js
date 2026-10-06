@@ -67,6 +67,17 @@ function formatTimeInMs(timeElapsed) {
   return `${milliseconds} ms`;
 }
 
+function updateBestRecord(records, levelId, roundScore) {
+  const score = Math.max(0, Number(roundScore) || 0);
+  const currentRecord = records[levelId];
+
+  if (currentRecord !== undefined && score <= currentRecord) {
+    return records;
+  }
+
+  return { ...records, [levelId]: score };
+}
+
 module.exports = {
   BASE_POINTS,
   ROUND_TIME_SECONDS,
@@ -75,4 +86,5 @@ module.exports = {
   getCountedResults,
   calculateMaxScore,
   formatTimeInMs,
+  updateBestRecord,
 };
