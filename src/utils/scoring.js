@@ -9,6 +9,30 @@
 
 const BASE_POINTS = 10;
 const ROUND_TIME_SECONDS = 30;
+const LEVEL_UNLOCK_POINTS = 1000;
+
+function getLevelProgress(points) {
+  const total = Math.max(0, Number(points) || 0);
+  return {
+    points: total,
+    percentage: Math.min(100, (total / LEVEL_UNLOCK_POINTS) * 100),
+    unlocked: total >= LEVEL_UNLOCK_POINTS,
+  };
+}
+
+function getHighestUnlockedLevelIndex(levels, pointsByLevel) {
+  let highestUnlockedIndex = 0;
+
+  for (let index = 0; index < levels.length - 1; index += 1) {
+    if (getLevelProgress(pointsByLevel[levels[index].id]).unlocked) {
+      highestUnlockedIndex = index + 1;
+    } else {
+      break;
+    }
+  }
+
+  return highestUnlockedIndex;
+}
 
 /**
  * Calculate the score for a correct answer based on response time.
@@ -81,6 +105,9 @@ function updateBestRecord(records, levelId, roundScore) {
 module.exports = {
   BASE_POINTS,
   ROUND_TIME_SECONDS,
+  LEVEL_UNLOCK_POINTS,
+  getLevelProgress,
+  getHighestUnlockedLevelIndex,
   calculateScore,
   calculateTotalScore,
   getCountedResults,

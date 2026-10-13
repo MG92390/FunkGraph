@@ -6,7 +6,42 @@ const {
   calculateMaxScore,
   formatTimeInMs,
   updateBestRecord,
+  getLevelProgress,
+  getHighestUnlockedLevelIndex,
+  LEVEL_UNLOCK_POINTS,
 } = require('./scoring');
+
+const levels = [
+  { id: 'troisieme' },
+  { id: 'seconde' },
+  { id: 'premiere' },
+  { id: 'terminale' },
+  { id: 'expert' },
+];
+
+test('level progress fills up to 1000 cumulative points', () => {
+  assert.deepEqual(getLevelProgress(86), {
+    points: 86,
+    percentage: 8.6,
+    unlocked: false,
+  });
+  assert.equal(getLevelProgress(LEVEL_UNLOCK_POINTS).unlocked, true);
+  assert.equal(getLevelProgress(1200).percentage, 100);
+});
+
+test('levels unlock in order after earning 1000 points on the previous level', () => {
+  assert.equal(getHighestUnlockedLevelIndex(levels, {}), 0);
+  assert.equal(getHighestUnlockedLevelIndex(levels, { troisieme: 999 }), 0);
+  assert.equal(getHighestUnlockedLevelIndex(levels, { troisieme: 1000 }), 1);
+  assert.equal(
+    getHighestUnlockedLevelIndex(levels, { troisieme: 1000, seconde: 1000 }),
+    2
+  );
+  assert.equal(
+    getHighestUnlockedLevelIndex(levels, { troisieme: 0, seconde: 1000 }),
+    0
+  );
+});
 
 test('score thresholds match the new millisecond barème', () => {
   assert.equal(calculateScore(0.8), 10);
