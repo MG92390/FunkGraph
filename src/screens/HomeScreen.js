@@ -16,6 +16,8 @@ const HomeScreen = ({
   onOpenCourse,
   selectedLevel,
   onSelectLevel,
+  allLevelsUnlocked = false,
+  onToggleAllLevelsUnlocked,
   recordsByLevel = {},
   pointsByLevel = {},
 }) => {
@@ -30,6 +32,15 @@ const HomeScreen = ({
       <TouchableOpacity style={styles.courseButton} onPress={onOpenCourse} activeOpacity={0.85}>
         <Text style={styles.courseButtonText}>Voir les fonctions du cours</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.trainingButton, allLevelsUnlocked && styles.trainingButtonActive]}
+        onPress={onToggleAllLevelsUnlocked}
+        activeOpacity={0.85}
+      >
+        <Text style={[styles.trainingButtonText, allLevelsUnlocked && styles.trainingButtonTextActive]}>
+          {allLevelsUnlocked ? 'Mode entraînement actif · désactiver' : 'Activer le mode entraînement'}
+        </Text>
+      </TouchableOpacity>
 
       <ScrollView
         style={styles.levelList}
@@ -40,7 +51,7 @@ const HomeScreen = ({
           const isSelected = selectedLevel === level.id;
           const record = recordsByLevel[level.id];
           const progress = getLevelProgress(pointsByLevel[level.id]);
-          const isUnlocked = levelIndex <= highestUnlockedLevelIndex;
+          const isUnlocked = allLevelsUnlocked || levelIndex <= highestUnlockedLevelIndex;
           const previousLevelPoints = levelIndex > 0
             ? pointsByLevel[LEVELS[levelIndex - 1].id] || 0
             : 0;
@@ -129,6 +140,25 @@ const styles = StyleSheet.create({
     color: '#2E7D32',
     fontSize: 15,
     fontWeight: '700',
+  },
+  trainingButton: {
+    alignSelf: 'center',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 22,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    marginBottom: 16,
+  },
+  trainingButtonActive: {
+    backgroundColor: '#E8F5E9',
+  },
+  trainingButtonText: {
+    color: '#616161',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  trainingButtonTextActive: {
+    color: '#2E7D32',
   },
   levelList: {
     flex: 1,

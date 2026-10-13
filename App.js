@@ -4,7 +4,8 @@ import HomeScreen from './src/screens/HomeScreen';
 import CourseScreen from './src/screens/CourseScreen';
 import QuizScreen from './src/screens/QuizScreen';
 import ResultsScreen from './src/screens/ResultsScreen';
-import { updateBestRecord } from './src/utils/scoring';
+import { LEVELS } from './src/data/functions';
+import { getHighestUnlockedLevelIndex, updateBestRecord } from './src/utils/scoring';
 
 const RECORDS_STORAGE_KEY = 'funkgraphs.bestRecords.v1';
 const POINTS_STORAGE_KEY = 'funkgraphs.levelPoints.v1';
@@ -21,6 +22,7 @@ const POINTS_STORAGE_KEY = 'funkgraphs.levelPoints.v1';
 export default function App() {
   const [screen, setScreen] = useState('home');
   const [selectedLevel, setSelectedLevel] = useState('troisieme');
+  const [allLevelsUnlocked, setAllLevelsUnlocked] = useState(true);
   const [quizResults, setQuizResults] = useState([]);
   const [recordsByLevel, setRecordsByLevel] = useState({});
   const [pointsByLevel, setPointsByLevel] = useState({});
@@ -85,6 +87,17 @@ export default function App() {
     setSelectedLevel(levelId);
   };
 
+  const handleToggleAllLevelsUnlocked = () => {
+    if (allLevelsUnlocked) {
+      const highestUnlockedIndex = getHighestUnlockedLevelIndex(LEVELS, pointsByLevel);
+      setSelectedLevel(LEVELS[highestUnlockedIndex].id);
+      setAllLevelsUnlocked(false);
+      return;
+    }
+
+    setAllLevelsUnlocked(true);
+  };
+
   const handleStartQuiz = (levelId = selectedLevel) => {
     setSelectedLevel(levelId);
     setScreen('quiz');
@@ -124,6 +137,8 @@ export default function App() {
           onSelectLevel={handleSelectLevel}
           onStart={handleStartQuiz}
           onOpenCourse={handleOpenCourse}
+          allLevelsUnlocked={allLevelsUnlocked}
+          onToggleAllLevelsUnlocked={handleToggleAllLevelsUnlocked}
           recordsByLevel={recordsByLevel}
           pointsByLevel={pointsByLevel}
         />
@@ -148,8 +163,9 @@ export default function App() {
           onSelectLevel={handleSelectLevel}
           onStart={handleStartQuiz}
           onOpenCourse={handleOpenCourse}
+          allLevelsUnlocked={allLevelsUnlocked}
+          onToggleAllLevelsUnlocked={handleToggleAllLevelsUnlocked}
           recordsByLevel={recordsByLevel}
-          pointsByLevel={pointsByLevel}
           pointsByLevel={pointsByLevel}
         />
       );

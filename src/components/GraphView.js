@@ -39,8 +39,26 @@ const GraphView = ({ func, width = 150, height = 150, showLabel = false }) => {
   const segments = [];
   let currentSegment = [];
 
-  for (let i = 0; i <= numPoints; i += 1) {
-    const x = domain[0] + i * step;
+  const sampleXs = [];
+  if (func.id === 'natural_log' || func.id === 'log_x') {
+    const firstVisibleX = Math.max(domain[0], Math.exp(range[0]));
+    const lastVisibleX = Math.min(domain[1], Math.exp(range[1]));
+
+    if (firstVisibleX < lastVisibleX) {
+      const firstVisibleY = Math.log(firstVisibleX);
+      const lastVisibleY = Math.log(lastVisibleX);
+      for (let i = 0; i <= numPoints; i += 1) {
+        const y = firstVisibleY + ((lastVisibleY - firstVisibleY) * i) / numPoints;
+        sampleXs.push(Math.exp(y));
+      }
+    }
+  } else {
+    for (let i = 0; i <= numPoints; i += 1) {
+      sampleXs.push(domain[0] + i * step);
+    }
+  }
+
+  for (const x of sampleXs) {
     const y = fn(x);
 
     if (!isFinite(y) || Number.isNaN(y)) {
